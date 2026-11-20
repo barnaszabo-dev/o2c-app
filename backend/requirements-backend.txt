@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+pandas
+pyarrow
+# --- later, when the ML module is implemented ---
+scikit-learn
+statsmodels
+shap
+scipy
+# joblib

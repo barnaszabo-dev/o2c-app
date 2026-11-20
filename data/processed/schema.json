@@ -1,0 +1,995 @@
+{
+ "dataset": {
+  "id": "d47ba0a8b4db",
+  "source_file": "Lead_Time_between_steps_in_hour.xlsx",
+  "built_at": "2026-11-14T14:10:50",
+  "n_rows": 14601,
+  "parquet": "orders_processed.parquet"
+ },
+ "events": [
+  "purchase_order",
+  "sales_order_sap",
+  "erp_order",
+  "scheduling_match",
+  "scheduled_status",
+  "z5_removal",
+  "order_confirmation",
+  "real_loading"
+ ],
+ "prediction_points": {
+  "at_purchase_order": {
+   "event": "purchase_order",
+   "label": "When the purchase order arrives"
+  },
+  "at_sales_order": {
+   "event": "sales_order_sap",
+   "label": "When the sales order is created in SAP"
+  },
+  "at_erp_order": {
+   "event": "erp_order",
+   "label": "When the ERP order is created in SF"
+  },
+  "at_scheduling_match": {
+   "event": "scheduling_match",
+   "label": "After the scheduling match"
+  }
+ },
+ "filters": [
+  {
+   "id": "region",
+   "dashboard_key": "reg",
+   "column": "d_region_code",
+   "label": "Region"
+  },
+  {
+   "id": "company",
+   "dashboard_key": "Company",
+   "column": "Company",
+   "label": "Company"
+  },
+  {
+   "id": "doc_type",
+   "dashboard_key": "Sales Document type",
+   "column": "Sales Document type",
+   "label": "Sales Document type"
+  },
+  {
+   "id": "allocation_group",
+   "dashboard_key": "ag",
+   "column": "d_allocation_group",
+   "label": "Allocation group (Initial / Additional demand)"
+  },
+  {
+   "id": "source_of_allocation",
+   "dashboard_key": "Source of Allocation",
+   "column": "Source of Allocation",
+   "label": "Source of Allocation (raw)"
+  },
+  {
+   "id": "pn_group",
+   "dashboard_key": "PNGroup",
+   "column": "PNGroup",
+   "label": "PNGroup"
+  },
+  {
+   "id": "sales_rep",
+   "dashboard_key": "Sales Rep",
+   "column": "Sales Rep",
+   "label": "Sales Rep"
+  },
+  {
+   "id": "material_group_5",
+   "dashboard_key": "Material group 5",
+   "column": "Material group 5",
+   "label": "Material group 5"
+  },
+  {
+   "id": "distribution_channel",
+   "dashboard_key": "Distribution Channel",
+   "column": "Distribution Channel",
+   "label": "Distribution Channel"
+  },
+  {
+   "id": "early",
+   "dashboard_key": "early",
+   "column": "d_early",
+   "label": "Early / Non-early"
+  },
+  {
+   "id": "month_of_allocation",
+   "dashboard_key": "Month of Allocation",
+   "column": "Month of Allocation",
+   "label": "Month of Allocation"
+  },
+  {
+   "id": "customer_category",
+   "dashboard_key": null,
+   "column": "d_customer_category",
+   "label": "T1 / T2 / RS (initial allocation only)"
+  }
+ ],
+ "measures": [
+  {
+   "id": "po_to_so_sap",
+   "source_column": "Purchase order date - order created in SAP (Purchase ordar date ->Sales Order creation in SAP)",
+   "hours_column": "h_po_to_so_sap",
+   "label": "PO -> SO created in SAP",
+   "kind": "sequential",
+   "start_event": "purchase_order",
+   "end_event": "sales_order_sap",
+   "n_valid": 14601,
+   "n_negative": 0,
+   "median_hours": 12.531
+  },
+  {
+   "id": "so_to_erp",
+   "source_column": "Order created in SAP- ERP order created in SF (Sales Order creation in SAP ->Sales Order upload from SAP to CRM)",
+   "hours_column": "h_so_to_erp",
+   "label": "SO created -> ERP order (SF)",
+   "kind": "sequential",
+   "start_event": "sales_order_sap",
+   "end_event": "erp_order",
+   "n_valid": 14601,
+   "n_negative": 0,
+   "median_hours": 1.749
+  },
+  {
+   "id": "erp_to_sched_match",
+   "source_column": "ERP order created in SF -Scheduling match (Sales Order upload from SAP to CRM -> Order-matching volume & price)",
+   "hours_column": "h_erp_to_sched_match",
+   "label": "ERP order -> Scheduling match",
+   "kind": "sequential",
+   "start_event": "erp_order",
+   "end_event": "scheduling_match",
+   "n_valid": 14601,
+   "n_negative": 0,
+   "median_hours": 4.434
+  },
+  {
+   "id": "sched_match_to_stat",
+   "source_column": "Scheduling match-Scheduled status (Order-matching volume & price -> Schedulers‘ material availability check )",
+   "hours_column": "h_sched_match_to_stat",
+   "label": "Scheduling match -> Scheduled status",
+   "kind": "sequential",
+   "start_event": "scheduling_match",
+   "end_event": "scheduled_status",
+   "n_valid": 14601,
+   "n_negative": 0,
+   "median_hours": 4.5
+  },
+  {
+   "id": "stat_to_z5",
+   "source_column": "Scheduled status-Z5 removal (Schedulers‘ material availability check ->Sales Order backload from CRM to SAP)",
+   "hours_column": "h_stat_to_z5",
+   "label": "Scheduled status -> Z5 removal",
+   "kind": "sequential",
+   "start_event": "scheduled_status",
+   "end_event": "z5_removal",
+   "n_valid": 11407,
+   "n_negative": 27,
+   "median_hours": 1.368
+  },
+  {
+   "id": "z5_to_oc",
+   "source_column": "Z5 removal-Order confirmation sent (Sales Order backload from CRM to SAP ->Order-confirmation)",
+   "hours_column": "h_z5_to_oc",
+   "label": "Z5 removal -> Order confirmation sent",
+   "kind": "sequential",
+   "start_event": "z5_removal",
+   "end_event": "order_confirmation",
+   "n_valid": 11407,
+   "n_negative": 56,
+   "median_hours": 1.942
+  },
+  {
+   "id": "oc_to_loading",
+   "source_column": "Order confirmation sent-Real Loading Date",
+   "hours_column": "h_oc_to_loading",
+   "label": "Order confirmation -> Real loading",
+   "kind": "sequential",
+   "start_event": "order_confirmation",
+   "end_event": "real_loading",
+   "n_valid": 14601,
+   "n_negative": 351,
+   "median_hours": 175.67
+  },
+  {
+   "id": "po_to_oc_agg",
+   "source_column": "purchase order date >> order confirmation date",
+   "hours_column": "h_po_to_oc_agg",
+   "label": "PO date >> Order confirmation",
+   "kind": "aggregated",
+   "start_event": "purchase_order",
+   "end_event": "order_confirmation",
+   "n_valid": 14601,
+   "n_negative": 0,
+   "median_hours": 80.126
+  },
+  {
+   "id": "erp_to_z5",
+   "source_column": "ERP order created >> Z5 removal",
+   "hours_column": "h_erp_to_z5",
+   "label": "ERP order >> Z5 removal",
+   "kind": "aggregated",
+   "start_event": "erp_order",
+   "end_event": "z5_removal",
+   "n_valid": 11407,
+   "n_negative": 0,
+   "median_hours": 62.636
+  },
+  {
+   "id": "erp_to_sm_agg",
+   "source_column": "ERP order created >> scheduling match",
+   "hours_column": "h_erp_to_sm_agg",
+   "label": "ERP order >> Scheduling match",
+   "kind": "aggregated",
+   "start_event": "erp_order",
+   "end_event": "scheduling_match",
+   "n_valid": 14601,
+   "n_negative": 0,
+   "median_hours": 4.434
+  },
+  {
+   "id": "sm_to_ss_agg",
+   "source_column": "Scheduling mathced >> Scheuled status",
+   "hours_column": "h_sm_to_ss_agg",
+   "label": "Scheduling match >> Scheduled status",
+   "kind": "aggregated",
+   "start_event": "scheduling_match",
+   "end_event": "scheduled_status",
+   "n_valid": 14601,
+   "n_negative": 0,
+   "median_hours": 4.5
+  },
+  {
+   "id": "erp_to_oc",
+   "source_column": "ERP order created >> order confirmation date",
+   "hours_column": "h_erp_to_oc",
+   "label": "ERP order >> Order confirmation",
+   "kind": "aggregated",
+   "start_event": "erp_order",
+   "end_event": "order_confirmation",
+   "n_valid": 14601,
+   "n_negative": 0,
+   "median_hours": 79.84
+  },
+  {
+   "id": "erp_to_price_match",
+   "source_column": "ERP order created>>price match",
+   "hours_column": "h_erp_to_price_match",
+   "label": "ERP order >> Price match",
+   "kind": "aggregated",
+   "start_event": "erp_order",
+   "end_event": null,
+   "n_valid": 14601,
+   "n_negative": 0,
+   "median_hours": 9.838
+  },
+  {
+   "id": "po_to_loading",
+   "source_column": "Purchase Order Date-Real Loading date",
+   "hours_column": "h_po_to_loading",
+   "label": "PO date -> Real loading (whole days)",
+   "kind": "aggregated",
+   "start_event": "purchase_order",
+   "end_event": "real_loading",
+   "n_valid": 14601,
+   "n_negative": 0,
+   "median_hours": 288.0
+  },
+  {
+   "id": "so_to_oc",
+   "source_column": "Sales Order Created -> Order Confirmation",
+   "hours_column": "h_so_to_oc",
+   "label": "SO created -> Order confirmation",
+   "kind": "derived",
+   "start_event": "sales_order_sap",
+   "end_event": "order_confirmation",
+   "n_valid": 14601,
+   "n_negative": 7,
+   "median_hours": 65.862
+  },
+  {
+   "id": "po_to_oc",
+   "source_column": "Purchase Order -> Order Confirmation",
+   "hours_column": "h_po_to_oc",
+   "label": "PO -> Order confirmation",
+   "kind": "derived",
+   "start_event": "purchase_order",
+   "end_event": "order_confirmation",
+   "n_valid": 14601,
+   "n_negative": 0,
+   "median_hours": 80.126
+  }
+ ],
+ "columns": [
+  {
+   "name": "Sales Document",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "identifier",
+   "role": "identifier",
+   "derived": false
+  },
+  {
+   "name": "Region",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "purchase_order",
+   "role": "dimension",
+   "derived": false
+  },
+  {
+   "name": "Sales Document type",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "sales_order_sap",
+   "role": "dimension",
+   "derived": false
+  },
+  {
+   "name": "Company",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "purchase_order",
+   "role": "dimension",
+   "derived": false
+  },
+  {
+   "name": "Sold-to party",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "purchase_order",
+   "role": "dimension_high_cardinality",
+   "derived": false
+  },
+  {
+   "name": "Name",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "purchase_order",
+   "role": "dimension_high_cardinality",
+   "derived": false
+  },
+  {
+   "name": "Sales Rep",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "purchase_order",
+   "role": "dimension",
+   "derived": false
+  },
+  {
+   "name": "INCO1",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "sales_order_sap",
+   "role": "dimension",
+   "derived": false
+  },
+  {
+   "name": "Source of Allocation",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "sales_order_sap",
+   "role": "dimension",
+   "derived": false
+  },
+  {
+   "name": "Purchase Order Date",
+   "dtype": "datetime64[ns]",
+   "n_missing": 0,
+   "availability": "purchase_order",
+   "role": "timestamp",
+   "derived": false
+  },
+  {
+   "name": "Create Sales Order Item",
+   "dtype": "datetime64[ns]",
+   "n_missing": 0,
+   "availability": "sales_order_sap",
+   "role": "timestamp",
+   "derived": false
+  },
+  {
+   "name": "Order Confirmation Date",
+   "dtype": "datetime64[ns]",
+   "n_missing": 0,
+   "availability": "order_confirmation",
+   "role": "timestamp",
+   "derived": false
+  },
+  {
+   "name": "Month of Allocation",
+   "dtype": "int64",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "dimension",
+   "derived": false
+  },
+  {
+   "name": "Allocation Date",
+   "dtype": "datetime64[ns]",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "timestamp",
+   "derived": false
+  },
+  {
+   "name": "diff between sale plan and order",
+   "dtype": "int64",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "numeric",
+   "derived": false
+  },
+  {
+   "name": "korai / nem korai rendelés",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "dimension",
+   "derived": false
+  },
+  {
+   "name": "Distribution Channel",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "sales_order_sap",
+   "role": "dimension",
+   "derived": false
+  },
+  {
+   "name": "Item type",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "sales_order_sap",
+   "role": "dimension",
+   "derived": false
+  },
+  {
+   "name": "Material group 5",
+   "dtype": "float64",
+   "n_missing": 4,
+   "availability": "sales_order_sap",
+   "role": "dimension",
+   "derived": false
+  },
+  {
+   "name": "Sales Order Item Created",
+   "dtype": "datetime64[ns]",
+   "n_missing": 0,
+   "availability": "sales_order_sap",
+   "role": "timestamp",
+   "derived": false
+  },
+  {
+   "name": "Z5 block removal",
+   "dtype": "datetime64[ns]",
+   "n_missing": 3194,
+   "availability": "z5_removal",
+   "role": "timestamp",
+   "derived": false
+  },
+  {
+   "name": "Loading Date",
+   "dtype": "datetime64[ns]",
+   "n_missing": 0,
+   "availability": "real_loading",
+   "role": "timestamp",
+   "derived": false
+  },
+  {
+   "name": "Field / Event",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "z5_removal",
+   "role": "log",
+   "derived": false
+  },
+  {
+   "name": "Old Value",
+   "dtype": "object",
+   "n_missing": 7556,
+   "availability": "z5_removal",
+   "role": "log",
+   "derived": false
+  },
+  {
+   "name": "New Value",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "z5_removal",
+   "role": "log",
+   "derived": false
+  },
+  {
+   "name": "Schedule match date",
+   "dtype": "datetime64[ns]",
+   "n_missing": 0,
+   "availability": "scheduling_match",
+   "role": "timestamp",
+   "derived": false
+  },
+  {
+   "name": "QualityLevel",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "dimension",
+   "derived": false
+  },
+  {
+   "name": "ERP CreatedDate",
+   "dtype": "datetime64[ns]",
+   "n_missing": 0,
+   "availability": "erp_order",
+   "role": "timestamp",
+   "derived": false
+  },
+  {
+   "name": "Price match date",
+   "dtype": "datetime64[ns]",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "timestamp",
+   "derived": false
+  },
+  {
+   "name": "Pltyp",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "sales_order_sap",
+   "role": "dimension",
+   "derived": false
+  },
+  {
+   "name": "PNGroup",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "sales_order_sap",
+   "role": "dimension",
+   "derived": false
+  },
+  {
+   "name": "Zsourcemat",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "sales_order_sap",
+   "role": "dimension",
+   "derived": false
+  },
+  {
+   "name": "Scheduled status",
+   "dtype": "datetime64[ns]",
+   "n_missing": 0,
+   "availability": "scheduled_status",
+   "role": "timestamp",
+   "derived": false
+  },
+  {
+   "name": "Past due reason",
+   "dtype": "object",
+   "n_missing": 14296,
+   "availability": "review",
+   "role": "text",
+   "derived": false
+  },
+  {
+   "name": "Sales comment",
+   "dtype": "object",
+   "n_missing": 13593,
+   "availability": "review",
+   "role": "text",
+   "derived": false
+  },
+  {
+   "name": "Loaded volume",
+   "dtype": "float64",
+   "n_missing": 1,
+   "availability": "real_loading",
+   "role": "numeric",
+   "derived": false
+  },
+  {
+   "name": "Sale Plan",
+   "dtype": "object",
+   "n_missing": 1,
+   "availability": "review",
+   "role": "numeric",
+   "derived": false
+  },
+  {
+   "name": "Purchase order date - order created in SAP (Purchase ordar date ->Sales Order creation in SAP)",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": "Order created in SAP- ERP order created in SF (Sales Order creation in SAP ->Sales Order upload from SAP to CRM)",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": "ERP order created in SF -Scheduling match (Sales Order upload from SAP to CRM -> Order-matching volume & price)",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": "Scheduling match-Scheduled status (Order-matching volume & price -> Schedulers‘ material availability check )",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": "Scheduled status-Z5 removal (Schedulers‘ material availability check ->Sales Order backload from CRM to SAP)",
+   "dtype": "float64",
+   "n_missing": 3194,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": "Z5 removal-Order confirmation sent (Sales Order backload from CRM to SAP ->Order-confirmation)",
+   "dtype": "float64",
+   "n_missing": 3194,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": "Order confirmation sent-Real Loading Date",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": "purchase order date >> order confirmation date",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": "ERP order created >> Z5 removal",
+   "dtype": "float64",
+   "n_missing": 3194,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": "ERP order created >> scheduling match",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": "Scheduling mathced >> Scheuled status",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": "ERP order created >> order confirmation date",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": "ERP order created>>price match",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": "Purchase Order Date-Real Loading date",
+   "dtype": "int64",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": "Lead time relevancy",
+   "dtype": "float64",
+   "n_missing": 14601,
+   "availability": "review",
+   "role": "metadata",
+   "derived": false
+  },
+  {
+   "name": "Comment",
+   "dtype": "object",
+   "n_missing": 11407,
+   "availability": "review",
+   "role": "text",
+   "derived": false
+  },
+  {
+   "name": "Oszlop1",
+   "dtype": "object",
+   "n_missing": 8702,
+   "availability": "review",
+   "role": "helper",
+   "derived": false
+  },
+  {
+   "name": "Schedule match date2",
+   "dtype": "datetime64[ns]",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": "ERP CreatedDate4",
+   "dtype": "datetime64[ns]",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": "Price match date5",
+   "dtype": "datetime64[ns]",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": "Scheduled status9",
+   "dtype": "datetime64[ns]",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": "Date of Allocation - Scheduling match",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "helper",
+   "derived": false
+  },
+  {
+   "name": "Sales Order Created -> Order Confirmation",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": "Purchase Order -> Order Confirmation",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "unclassified",
+   "derived": false
+  },
+  {
+   "name": ">48 SO-OC",
+   "dtype": "float64",
+   "n_missing": 7763,
+   "availability": "order_confirmation",
+   "role": "outcome_flag",
+   "derived": false
+  },
+  {
+   "name": ">48 PO-OC",
+   "dtype": "float64",
+   "n_missing": 8702,
+   "availability": "order_confirmation",
+   "role": "outcome_flag",
+   "derived": false
+  },
+  {
+   "name": "d_region_code",
+   "dtype": "string",
+   "n_missing": 0,
+   "availability": "purchase_order",
+   "role": "dimension",
+   "derived": true
+  },
+  {
+   "name": "d_allocation_group",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "sales_order_sap",
+   "role": "dimension",
+   "derived": true
+  },
+  {
+   "name": "d_customer_category",
+   "dtype": "string",
+   "n_missing": 2672,
+   "availability": "sales_order_sap",
+   "role": "dimension",
+   "derived": true
+  },
+  {
+   "name": "d_early",
+   "dtype": "string",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "dimension",
+   "derived": true
+  },
+  {
+   "name": "d_within_48h_po_oc",
+   "dtype": "bool",
+   "n_missing": 0,
+   "availability": "order_confirmation",
+   "role": "outcome_flag",
+   "derived": true
+  },
+  {
+   "name": "d_sales_document_base",
+   "dtype": "object",
+   "n_missing": 0,
+   "availability": "identifier",
+   "role": "group_key",
+   "derived": true
+  },
+  {
+   "name": "h_po_to_so_sap",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "sales_order_sap",
+   "role": "lead_time_measure",
+   "derived": true
+  },
+  {
+   "name": "h_so_to_erp",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "erp_order",
+   "role": "lead_time_measure",
+   "derived": true
+  },
+  {
+   "name": "h_erp_to_sched_match",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "scheduling_match",
+   "role": "lead_time_measure",
+   "derived": true
+  },
+  {
+   "name": "h_sched_match_to_stat",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "scheduled_status",
+   "role": "lead_time_measure",
+   "derived": true
+  },
+  {
+   "name": "h_stat_to_z5",
+   "dtype": "float64",
+   "n_missing": 3194,
+   "availability": "z5_removal",
+   "role": "lead_time_measure",
+   "derived": true
+  },
+  {
+   "name": "h_z5_to_oc",
+   "dtype": "float64",
+   "n_missing": 3194,
+   "availability": "order_confirmation",
+   "role": "lead_time_measure",
+   "derived": true
+  },
+  {
+   "name": "h_oc_to_loading",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "real_loading",
+   "role": "lead_time_measure",
+   "derived": true
+  },
+  {
+   "name": "h_po_to_oc_agg",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "order_confirmation",
+   "role": "lead_time_measure",
+   "derived": true
+  },
+  {
+   "name": "h_erp_to_z5",
+   "dtype": "float64",
+   "n_missing": 3194,
+   "availability": "z5_removal",
+   "role": "lead_time_measure",
+   "derived": true
+  },
+  {
+   "name": "h_erp_to_sm_agg",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "scheduling_match",
+   "role": "lead_time_measure",
+   "derived": true
+  },
+  {
+   "name": "h_sm_to_ss_agg",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "scheduled_status",
+   "role": "lead_time_measure",
+   "derived": true
+  },
+  {
+   "name": "h_erp_to_oc",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "order_confirmation",
+   "role": "lead_time_measure",
+   "derived": true
+  },
+  {
+   "name": "h_erp_to_price_match",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "review",
+   "role": "lead_time_measure",
+   "derived": true
+  },
+  {
+   "name": "h_po_to_loading",
+   "dtype": "int64",
+   "n_missing": 0,
+   "availability": "real_loading",
+   "role": "lead_time_measure",
+   "derived": true
+  },
+  {
+   "name": "h_so_to_oc",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "order_confirmation",
+   "role": "lead_time_measure",
+   "derived": true
+  },
+  {
+   "name": "h_po_to_oc",
+   "dtype": "float64",
+   "n_missing": 0,
+   "availability": "order_confirmation",
+   "role": "lead_time_measure",
+   "derived": true
+  }
+ ],
+ "quality": {
+  "unique_sales_document": true,
+  "n_unique_base_documents": 12040,
+  "durations_stored_in": "days (converted to hours in h_* columns)",
+  "flag_gt48_po_oc_means_within_48h": true,
+  "lead_time_relevancy_populated": false,
+  "z5_removal_missing_pct": 21.9
+ }
+}
